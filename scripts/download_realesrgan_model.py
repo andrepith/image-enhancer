@@ -1,22 +1,25 @@
 import os
 import requests
+from tqdm import tqdm
 
-def download_model():
-    model_url = "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
-    model_path = "app/models/RealESRGAN_x4plus.pth"
-    
-    os.makedirs(os.path.dirname(model_path), exist_ok=True)
-    if os.path.exists(model_path):
-        print("Model already downloaded.")
-        return
+MODEL_URL = "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
+DEST_PATH = "app/models/RealESRGAN_x4plus.pth"
 
-    print("Downloading Real-ESRGAN model...")
-    r = requests.get(model_url, stream=True)
-    with open(model_path, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=8192):
-            if chunk:
-                f.write(chunk)
-    print("Download complete.")
+os.makedirs(os.path.dirname(DEST_PATH), exist_ok=True)
 
-if __name__ == "__main__":
-    download_model()
+print("Downloading RealESRGAN_x4plus model...")
+response = requests.get(MODEL_URL, stream=True)
+total_size = int(response.headers.get('content-length', 0))
+
+with open(DEST_PATH, 'wb') as f, tqdm(
+    desc=DEST_PATH,
+    total=total_size,
+    unit='B',
+    unit_scale=True,
+    unit_divisor=1024,
+) as bar:
+    for data in response.iter_content(1024):
+        f.write(data)
+        bar.update(len(data))
+
+print("✅ Download complete.")
