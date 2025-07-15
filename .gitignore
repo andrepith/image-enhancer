@@ -1,9 +1,25 @@
-venv
-*.pkl
-__pycahes__
-__pycache__
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints
+
+# Virtual environment
+venv/
 .env
-*.h5
-.cache/
-*.zip
-*.csv
+
+# Model weights
+*.pth
+
+# Output images
+/data/processed/*.jpg
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
