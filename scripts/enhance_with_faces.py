@@ -9,33 +9,24 @@ from gfpgan import GFPGANer
 from app.core.image_utils import show_side_by_side
 
 def enhance_faces(input_path, output_path):
-    model_path = "app/models/GFPGANv1.4.pth"
-
-    # Init GFPGAN
-    restorer = GFPGANer(
-        model_path=model_path,
-        upscale=2,
-        arch="clean",
-        channel_multiplier=2,
-        bg_upsampler=None
-    )
-
-    # Load image
     img = cv2.imread(input_path, cv2.IMREAD_COLOR)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    # Enhance
-    result = restorer.enhance(img, has_aligned=False, only_center_face=False, paste_back=True)
-    restored_img = result[1]
+    restorer = GFPGANer(
+        model_path="app/models/GFPGANv1.4.pth",
+        upscale=2,
+        arch="clean",
+        channel_multiplier=2,
+        bg_upsampler=None,
+    )
 
+    _, restored_img_list, _ = restorer.enhance(
+        img, has_aligned=False, only_center_face=True, paste_back=True
+    )
 
-    # Save output
-    restored_pil = Image.fromarray(restored_img[0])
+    restored_pil = Image.fromarray(restored_img_list[0])  # <-- key fix
     restored_pil.save(output_path)
-
-    # Compare
-    original = Image.fromarray(img)
-    show_side_by_side(original, restored_pil, title1="Original", title2="Face Enhanced")
+    show_side_by_side(img, restored_img_list[0])
 
 if __name__ == "__main__":
     enhance_faces("data/raw/old_photo_2.jpg", "data/processed/enhanced_with_faces_2.jpg")
